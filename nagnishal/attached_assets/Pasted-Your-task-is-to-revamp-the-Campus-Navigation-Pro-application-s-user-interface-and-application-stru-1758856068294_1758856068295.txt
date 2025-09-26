@@ -1,0 +1,61 @@
+Your task is to revamp the "Campus Navigation Pro" application's user interface and application structure (backend flow) without altering any of the core pathfinding or AI logic.
+
+📌 Project Goal
+
+Visual Change: Implement a complete Cyberpunk Dark Mode theme.
+
+Structural Change: Refactor the main application flow using Streamlit tabs instead of a single sidebar layout.
+
+Preserve Logic: Crucially, the files pathfinding.py and gemini_integration.py must not be opened or edited. Your changes will only be in app.py.
+
+⚙️ Instructions for app.py
+
+1. Implement Cyberpunk Dark Mode (CSS Styling)
+
+Delete the existing professional CSS styling block in app.py and replace it with a new one that achieves the following:
+
+Background: Dark gray or black (#0a0f18 or similar).
+
+Text/Accents: Neon colors like electric blue, neon green, or vibrant magenta for headers, buttons, and borders.
+
+Header: Change the application title from "Campus Navigation Pro" to "CyberNav: Campus Route AI".
+
+Containers: Give the main elements (like the map container and info panel) a subtle neon border glow effect.
+
+2. Refactor to a Tabbed Layout
+
+Remove most of the layout logic from the sidebar. The main content area should be split into two tabs using st.tabs().
+
+Tab 1: 🗺️ Route Planner
+
+This tab should be the primary navigation interface.
+
+Move the Start Location, Destination, and Pathfinding Algorithm selection widgets (which were previously in the sidebar) into this tab.
+
+The "Find Optimal Path" button should trigger the route calculation logic.
+
+Display the Interactive Campus Map and Route Information (metrics) side-by-side in this tab, just as they were in the original two-column layout.
+
+Tab 2: 🧪 AI & Analysis
+
+This tab is for advanced tools and performance review.
+
+Move the entire AI Campus Assistant chat interface and its history display into this tab.
+
+Keep the existing calls to gemini.get_response() untouched.
+
+Move the Performance Analysis section (the "Compare Algorithms" and "Compare Heuristics" buttons and their resulting dataframes) into this tab.
+
+Keep the existing calls to pathfinder.compare_algorithms() and pathfinder.compare_heuristics() untouched.
+
+3. Initialization and Logic Constraint (CRITICAL)
+
+Preserve Initialization: Keep the initialize_pathfinder() and initialize_gemini() functions in app.py exactly as they are. The core logic depends on these initializations.
+
+Logic Constraint: You must not modify any code in:
+
+pathfinding.py: Do not touch the pathfinding algorithms (e.g., bfs_osm, astar_osm, euclidean_heuristic) or map creation logic.
+
+gemini_integration.py: Do not touch the location extraction, fuzzy matching, or query handling logic.
+
+Your job is to simply change where and how the results from these files are displayed in app.py.

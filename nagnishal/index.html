@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Navigator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #1a1a1a;
+            --container-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --accent-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            background-color: var(--container-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav-item {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--accent-color);
+            font-weight: 600;
+            transition: color 0.2s, background-color 0.2s;
+            border-radius: 6px;
+        }
+        .nav-item.active {
+            background-color: var(--accent-color);
+            color: var(--container-bg);
+        }
+        .nav-item:hover:not(.active) {
+            background-color: var(--border-color);
+        }
+        .container {
+            flex-grow: 1;
+            padding: 2rem;
+            display: flex;
+            gap: 2rem;
+        }
+        .section {
+            display: none;
+            flex-grow: 1;
+        }
+        .section.active {
+            display: block;
+        }
+        .card {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-bottom: 1.5rem;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        select, button, input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            background-color: var(--container-bg);
+            color: var(--text-color);
+        }
+        button {
+            background-color: var(--accent-color);
+            color: var(--container-bg);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 600;
+        }
+        button:hover {
+            background-color: #555555;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+        .map-container, .info-panel {
+            height: 500px;
+        }
+        .info-panel {
+            overflow-y: auto;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .metric-card {
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+        }
+        .metric-card span {
+            display: block;
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        .metric-card strong {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .chat-message {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .chat-message.user {
+            background-color: var(--accent-color);
+            color: var(--container-bg);
+            align-self: flex-end;
+        }
+        .chat-message.bot {
+            background-color: var(--border-color);
+            align-self: flex-start;
+        }
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .results-container {
+            margin-top: 1rem;
+        }
+        .results-container h3 {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+        th {
+            background-color: var(--accent-color);
+            color: var(--container-bg);
+        }
+        #loading-indicator {
+            text-align: center;
+            padding: 1rem;
+            display: none;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <h1>Campus Navigator</h1>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active" data-section="home">Home</a>
+            <a href="#" class="nav-item" data-section="help">Help</a>
+            <a href="#" class="nav-item" data-section="analysis">Analysis</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Home Section: Pathfinding -->
+        <section id="home-section" class="section active">
+            <div class="card">
+                <h2>Pathfinding</h2>
+                <div class="form-group">
+                    <label for="start-location">Start Location</label>
+                    <select id="start-location"></select>
+                </div>
+                <div class="form-group">
+                    <label for="end-location">Destination</label>
+                    <select id="end-location"></select>
+                </div>
+                <div class="form-group">
+                    <label for="algorithm">Algorithm</label>
+                    <select id="algorithm">
+                        <option value="A*">A*</option>
+                        <option value="BFS">BFS</option>
+                        <option value="DFS">DFS</option>
+                        <option value="UCS">UCS</option>
+                    </select>
+                </div>
+                <button id="find-path-btn">Find Optimal Path</button>
+            </div>
+            
+            <div class="grid-container">
+                <div class="card">
+                    <div id="map-container" style="width: 100%; height: 100%;"></div>
+                </div>
+                <div class="card">
+                    <h2>Route Information</h2>
+                    <div id="loading-indicator">
+                        <i class="fa fa-spinner fa-spin"></i> Loading...
+                    </div>
+                    <div id="route-info-content">
+                        <p>Select your start and end points and click "Find Optimal Path" to see the route information and map.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Help Section: Chatbot -->
+        <section id="help-section" class="section">
+            <div class="card">
+                <h2>AI Campus Assistant</h2>
+                <div id="chat-history" class="chat-container"></div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input-box" placeholder="Ask me anything about the campus...">
+                    <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analysis Section: Comparisons -->
+        <section id="analysis-section" class="section">
+            <div class="card">
+                <h2>Performance Analysis</h2>
+                <button id="compare-algorithms-btn">Compare All Algorithms</button>
+                <div id="algorithm-comparison-results" class="results-container"></div>
+                
+                <button id="compare-heuristics-btn" style="margin-top: 1rem;">Compare A* Heuristics</button>
+                <div id="heuristic-comparison-results" class="results-container"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const sections = document.querySelectorAll('.section');
+            const navItems = document.querySelectorAll('.nav-item');
+            const mapContainer = document.getElementById('map-container');
+            const routeInfoContent = document.getElementById('route-info-content');
+            const findPathBtn = document.getElementById('find-path-btn');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const chatHistory = document.getElementById('chat-history');
+            const chatInputBox = document.getElementById('chat-input-box');
+            const sendChatBtn = document.getElementById('send-chat-btn');
+            const compareAlgorithmsBtn = document.getElementById('compare-algorithms-btn');
+            const compareHeuristicsBtn = document.getElementById('compare-heuristics-btn');
+            const algorithmComparisonResults = document.getElementById('algorithm-comparison-results');
+            const heuristicComparisonResults = document.getElementById('heuristic-comparison-results');
+
+            let map;
+            let pathLine;
+            let markers = [];
+            const campusCenter = [13.2245, 77.7565];
+
+            // Initialize the map on the home section
+            const initMap = () => {
+                if (map) map.remove();
+                map = L.map(mapContainer).setView(campusCenter, 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+            };
+
+            // Fetch locations from the backend and populate dropdowns
+            const fetchLocations = async () => {
+                try {
+                    const response = await fetch('/locations');
+                    if (response.ok) {
+                        const locations = await response.json();
+                        const startSelect = document.getElementById('start-location');
+                        const endSelect = document.getElementById('end-location');
+                        
+                        // Clear existing options
+                        startSelect.innerHTML = '';
+                        endSelect.innerHTML = '';
+                        
+                        locations.forEach(loc => {
+                            const option1 = document.createElement('option');
+                            option1.value = loc;
+                            option1.textContent = loc;
+                            startSelect.appendChild(option1);
+
+                            const option2 = document.createElement('option');
+                            option2.value = loc;
+                            option2.textContent = loc;
+                            endSelect.appendChild(option2);
+                        });
+                        
+                        // Set different default values
+                        if (locations.length > 1) {
+                            endSelect.selectedIndex = 1;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch locations:', error);
+                }
+            };
+
+            // Switch sections based on navigation click
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.target.dataset.section + '-section';
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        }
+                    });
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    e.target.classList.add('active');
+                    if (targetId === 'home-section') {
+                        setTimeout(() => initMap(), 100); // Re-initialize map when home is active
+                    }
+                });
+            });
+
+            // Find path functionality
+            findPathBtn.addEventListener('click', async () => {
+                const startLocation = document.getElementById('start-location').value;
+                const endLocation = document.getElementById('end-location').value;
+                const algorithm = document.getElementById('algorithm').value;
+                
+                if (!startLocation || !endLocation) {
+                    alert('Please select both start and end locations.');
+                    return;
+                }
+                
+                loadingIndicator.style.display = 'block';
+                routeInfoContent.innerHTML = '';
+
+                try {
+                    const response = await fetch('/find_path', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            start: startLocation,
+                            end: endLocation,
+                            algorithm: algorithm
+                        })
+                    });
+                    
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        // Clear previous path and markers
+                        if (pathLine) map.removeLayer(pathLine);
+                        markers.forEach(m => map.removeLayer(m));
+                        markers = [];
+                        
+                        if (result.path && result.path.length > 0) {
+                            // Add start and end markers
+                            const startMarker = L.marker(result.path[0])
+                                .addTo(map)
+                                .bindPopup(`<b>Start:</b> ${startLocation}`)
+                                .openPopup();
+                            const endMarker = L.marker(result.path[result.path.length - 1])
+                                .addTo(map)
+                                .bindPopup(`<b>End:</b> ${endLocation}`);
+                            markers.push(startMarker, endMarker);
+
+                            // Draw the path on the map
+                            pathLine = L.polyline(result.path, { 
+                                color: '#333333', 
+                                weight: 4, 
+                                opacity: 0.8 
+                            }).addTo(map);
+                            map.fitBounds(pathLine.getBounds());
+                        }
+                        
+                        // Update route info
+                        const metrics = result.metrics;
+                        routeInfoContent.innerHTML = `
+                            <div class="metrics">
+                                <div class="metric-card">
+                                    <span>Algorithm</span>
+                                    <strong>${algorithm}</strong>
+                                </div>
+                                <div class="metric-card">
+                                    <span>Distance</span>
+                                    <strong>${metrics.distance.toFixed(2)}m</strong>
+                                </div>
+                                <div class="metric-card">
+                                    <span>Time</span>
+                                    <strong>${metrics.time.toFixed(1)}min</strong>
+                                </div>
+                                <div class="metric-card">
+                                    <span>Nodes Explored</span>
+                                    <strong>${metrics.nodes_explored}</strong>
+                                </div>
+                            </div>
+                            <div style="margin-top: 1.5rem;">
+                                <h3>Journey Details</h3>
+                                <p><strong>From:</strong> ${startLocation}</p>
+                                <p><strong>To:</strong> ${endLocation}</p>
+                                <p><strong>Status:</strong> Optimal path found</p>
+                            </div>
+                        `;
+                    } else {
+                        routeInfoContent.innerHTML = `<p style="color: red;">Error: ${result.error}</p>`;
+                    }
+                } catch (error) {
+                    routeInfoContent.innerHTML = `<p style="color: red;">Failed to fetch route: ${error.message}</p>`;
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            });
+
+            // Chatbot functionality
+            const sendMessage = async () => {
+                const userQuery = chatInputBox.value.trim();
+                if (!userQuery) return;
+
+                // Display user message
+                const userMessage = document.createElement('div');
+                userMessage.classList.add('chat-message', 'user');
+                userMessage.innerHTML = `<p>${userQuery}</p>`;
+                chatHistory.appendChild(userMessage);
+
+                chatInputBox.value = '';
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                // Show loading indicator
+                const botLoading = document.createElement('div');
+                botLoading.classList.add('chat-message', 'bot');
+                botLoading.innerHTML = `<p><i class="fa fa-spinner fa-spin"></i> Processing...</p>`;
+                chatHistory.appendChild(botLoading);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                try {
+                    const response = await fetch('/ask_gemini', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query: userQuery })
+                    });
+
+                    const result = await response.json();
+                    
+                    // Remove loading indicator
+                    botLoading.remove();
+
+                    // Display bot response
+                    const botMessage = document.createElement('div');
+                    botMessage.classList.add('chat-message', 'bot');
+                    if (response.ok) {
+                        botMessage.innerHTML = `<p>${result.text.replace(/\n/g, '<br>')}</p>`;
+                    } else {
+                        botMessage.innerHTML = `<p style="color: red;">Error: ${result.error}</p>`;
+                    }
+                    chatHistory.appendChild(botMessage);
+                } catch (error) {
+                    botLoading.remove();
+                    const botError = document.createElement('div');
+                    botError.classList.add('chat-message', 'bot');
+                    botError.innerHTML = `<p style="color: red;">Error: Failed to get a response from the AI assistant.</p>`;
+                    chatHistory.appendChild(botError);
+                } finally {
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                }
+            };
+
+            sendChatBtn.addEventListener('click', sendMessage);
+            chatInputBox.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Algorithm comparison functionality
+            compareAlgorithmsBtn.addEventListener('click', async () => {
+                algorithmComparisonResults.innerHTML = '<p><i class="fa fa-spinner fa-spin"></i> Running comparison...</p>';
+                try {
+                    const response = await fetch('/compare');
+                    const results = await response.json();
+                    if (response.ok) {
+                        let tableHTML = `
+                            <h3>Algorithm Performance Comparison</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Algorithm</th>
+                                        <th>Avg. Distance (m)</th>
+                                        <th>Avg. Nodes Explored</th>
+                                        <th>Avg. Time (min)</th>
+                                        <th>Success Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        results.forEach(row => {
+                            tableHTML += `
+                                <tr>
+                                    <td>${row['Algorithm']}</td>
+                                    <td>${row['Average Distance (m)'].toFixed(2)}</td>
+                                    <td>${row['Average Nodes Explored'].toFixed(2)}</td>
+                                    <td>${row['Average Time (min)'].toFixed(2)}</td>
+                                    <td>${row['Success Rate']}</td>
+                                </tr>
+                            `;
+                        });
+                        tableHTML += `</tbody></table>`;
+                        algorithmComparisonResults.innerHTML = tableHTML;
+                    } else {
+                        algorithmComparisonResults.innerHTML = `<p style="color: red;">Error: ${results.error}</p>`;
+                    }
+                } catch (error) {
+                    algorithmComparisonResults.innerHTML = `<p style="color: red;">Failed to fetch comparison data.</p>`;
+                }
+            });
+
+            // Heuristic comparison functionality
+            compareHeuristicsBtn.addEventListener('click', async () => {
+                heuristicComparisonResults.innerHTML = '<p><i class="fa fa-spinner fa-spin"></i> Running comparison...</p>';
+                try {
+                    const response = await fetch('/compare_heuristics');
+                    const results = await response.json();
+                    if (response.ok) {
+                        let tableHTML = `
+                            <h3>A* Heuristic Comparison</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Heuristic Type</th>
+                                        <th>Avg. Distance (m)</th>
+                                        <th>Avg. Nodes Explored</th>
+                                        <th>Avg. Time (min)</th>
+                                        <th>Efficiency Score</th>
+                                        <th>Success Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        results.forEach(row => {
+                            tableHTML += `
+                                <tr>
+                                    <td>${row['Heuristic Type']}</td>
+                                    <td>${row['Average Distance (m)'].toFixed(2)}</td>
+                                    <td>${row['Average Nodes Explored'].toFixed(2)}</td>
+                                    <td>${row['Average Time (min)'].toFixed(2)}</td>
+                                    <td>${row['Efficiency Score'].toFixed(2)}</td>
+                                    <td>${row['Success Rate']}</td>
+                                </tr>
+                            `;
+                        });
+                        tableHTML += `</tbody></table>`;
+                        heuristicComparisonResults.innerHTML = tableHTML;
+                    } else {
+                        heuristicComparisonResults.innerHTML = `<p style="color: red;">Error: ${results.error}</p>`;
+                    }
+                } catch (error) {
+                    heuristicComparisonResults.innerHTML = `<p style="color: red;">Failed to fetch comparison data.</p>`;
+                }
+            });
+
+            // Initialize everything
+            await fetchLocations();
+            initMap();
+        });
+    </script>
+</body>
+</html>
